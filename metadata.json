@@ -1,0 +1,8 @@
+{
+  "name": "Remix 15 August 942 morning GoonTube yda2127061@gmail.com to sor2127061 ",
+  "description": "Next-generation adult video platform featuring personalized recommendation algorithms, real-time sync, orientation controls, and immersive ambient lighting.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
