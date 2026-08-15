@@ -1,5 +1,13 @@
 import { supabase } from './supabase';
 
+export function getApiBaseUrl(): string {
+  const customUrl = (import.meta as any).env?.VITE_API_URL || (import.meta as any).env?.VITE_BACKEND_URL;
+  if (customUrl) {
+    return customUrl.replace(/\/+$/, '');
+  }
+  return '';
+}
+
 export interface ByseRemoteUploadStatus {
   url?: string;
   progress?: string;
@@ -27,7 +35,7 @@ export interface ByseUploadResult {
  */
 export async function getByseActiveEmbedDomain(): Promise<string> {
   try {
-    const res = await fetch('/api/byse/domain');
+    const res = await fetch(`${getApiBaseUrl()}/api/byse/domain`);
     if (!res.ok) throw new Error(`Failed to fetch domain: ${res.statusText}`);
     const data: ByseDomainResult = await res.json();
     return data.new_domain || data.old_domain || 'bysewihe.com';
@@ -38,7 +46,7 @@ export async function getByseActiveEmbedDomain(): Promise<string> {
 }
 
 export async function addByseRemoteUpload(videoUrl: string, title?: string): Promise<{ filecode: string }> {
-  const res = await fetch('/api/byse/remote/add', {
+  const res = await fetch(`${getApiBaseUrl()}/api/byse/remote/add`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ url: videoUrl, title }),
@@ -51,7 +59,7 @@ export async function addByseRemoteUpload(videoUrl: string, title?: string): Pro
 }
 
 export async function checkByseRemoteStatus(filecode: string): Promise<ByseRemoteUploadStatus> {
-  const res = await fetch(`/api/byse/remote/status?filecode=${encodeURIComponent(filecode)}`);
+  const res = await fetch(`${getApiBaseUrl()}/api/byse/remote/status?filecode=${encodeURIComponent(filecode)}`);
   const data = await res.json();
   if (!res.ok || data.error) {
     throw new Error(data.error || 'Failed to check remote upload status');
@@ -60,7 +68,7 @@ export async function checkByseRemoteStatus(filecode: string): Promise<ByseRemot
 }
 
 export async function getByseFileInfo(filecode: string) {
-  const res = await fetch(`/api/byse/file/info?filecode=${encodeURIComponent(filecode)}`);
+  const res = await fetch(`${getApiBaseUrl()}/api/byse/file/info?filecode=${encodeURIComponent(filecode)}`);
   const data = await res.json();
   if (!res.ok || data.error) {
     throw new Error(data.error || 'Failed to get file info');
