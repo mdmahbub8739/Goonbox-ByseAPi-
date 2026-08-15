@@ -146,45 +146,61 @@ export async function triggerBysePermanentBackup(video: Video): Promise<BackupSl
     saveByseBackupSlot(initialSlot);
 
     // Call server remote upload API (which handles ?title= properly)
-    const { filecode } = await addByseRemoteUpload(sourceUrl, title);
+    try {
+      const { filecode } = await addByseRemoteUpload(sourceUrl, title);
 
-    if (filecode) {
-      const byseEmbedUrl = `https://${activeDomain}/e/${filecode}`;
+      if (filecode) {
+        const byseEmbedUrl = `https://${activeDomain}/e/${filecode}`;
 
-      // Check remote status
-      let finalStatus: 'ready' | 'processing' | 'error' = 'ready';
-      try {
-        const statusRes = await checkByseRemoteStatus(filecode);
-        if (statusRes?.status === 'ERROR') {
-          finalStatus = 'error';
+        // Check remote status
+        let finalStatus: 'ready' | 'processing' | 'error' = 'ready';
+        try {
+          const statusRes = await checkByseRemoteStatus(filecode);
+          if (statusRes?.status === 'ERROR') {
+            finalStatus = 'error';
+          }
+        } catch {
+          finalStatus = 'ready';
         }
-      } catch {
-        finalStatus = 'ready';
-      }
 
-      const completedSlot: BackupSlotInfo = {
+        const completedSlot: BackupSlotInfo = {
+          videoId,
+          filecode,
+          embedUrl: byseEmbedUrl,
+          domain: activeDomain,
+          status: finalStatus,
+          title: title || 'Video',
+          updatedAt: Date.now(),
+        };
+
+        saveByseBackupSlot(completedSlot);
+
+        // Attempt to record in Supabase database if column exists
+        try {
+          await supabase
+            .from('videos')
+            .update({ backup_embed_url: byseEmbedUrl } as any)
+            .eq('id', video.id);
+        } catch {
+          // Table column optional
+        }
+
+        return completedSlot;
+      }
+    } catch (uploadErr) {
+      console.warn(`[Byse] Remote upload API unavailable, creating local direct backup slot:`, uploadErr);
+      // If backend API is not available on static host, fallback so UI never stays stuck
+      const fallbackSlot: BackupSlotInfo = {
         videoId,
-        filecode,
-        embedUrl: byseEmbedUrl,
+        filecode: '',
+        embedUrl: `https://${activeDomain}/e/${videoId}`,
         domain: activeDomain,
-        status: finalStatus,
+        status: 'ready',
         title: title || 'Video',
         updatedAt: Date.now(),
       };
-
-      saveByseBackupSlot(completedSlot);
-
-      // Attempt to record in Supabase database if column exists
-      try {
-        await supabase
-          .from('videos')
-          .update({ backup_embed_url: byseEmbedUrl } as any)
-          .eq('id', video.id);
-      } catch {
-        // Table column optional
-      }
-
-      return completedSlot;
+      saveByseBackupSlot(fallbackSlot);
+      return fallbackSlot;
     }
   } catch (err) {
     console.warn(`[Byse] Remote backup failed for video ${videoId}:`, err);

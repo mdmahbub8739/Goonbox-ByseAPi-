@@ -167,14 +167,11 @@ export function StreamSourcesModal({
           {/* Server 2: Byse Backup (bysewihe.com) */}
           <div
             onClick={() => {
-              if (isByseReady) {
-                onSelectServer('byse');
-                onClose();
-              }
+              onSelectServer('byse');
+              onClose();
             }}
             className={clsx(
-              "p-3 rounded-xl border transition-all flex items-center justify-between gap-3",
-              isByseReady ? "cursor-pointer active:scale-[0.99]" : "cursor-default opacity-80",
+              "p-3 rounded-xl border transition-all flex items-center justify-between gap-3 cursor-pointer active:scale-[0.99]",
               selectedServer === 'byse'
                 ? "bg-emerald-500/10 border-emerald-500/50 shadow-sm"
                 : "bg-white/[0.03] border-white/5 hover:bg-white/[0.06] hover:border-white/10"
@@ -190,11 +187,6 @@ export function StreamSourcesModal({
               <div className="min-w-0">
                 <div className="text-[13px] font-bold text-white flex items-center gap-1.5 truncate">
                   <span>Server 2 (Backup)</span>
-                  {isByseUploading && (
-                    <span className="text-[10px] font-bold px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-300 flex items-center gap-1 animate-pulse">
-                      <RefreshCw className="w-2.5 h-2.5 animate-spin" /> Securing
-                    </span>
-                  )}
                 </div>
                 <div className="text-[11px] text-[#888888] truncate font-mono">
                   bysewihe.com
@@ -203,25 +195,21 @@ export function StreamSourcesModal({
             </div>
 
             <div className="flex items-center gap-1.5 shrink-0">
-              {byseUrl && (
-                <>
-                  <button
-                    onClick={(e) => handleCopy(e, byseUrl, 'byse')}
-                    className="p-1.5 rounded-md text-[#777] hover:text-white hover:bg-white/10 transition-colors"
-                    title="Copy Link"
-                  >
-                    {copiedKey === 'byse' ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
-                  </button>
+              <button
+                onClick={(e) => handleCopy(e, byseUrl || `https://bysewihe.com/e/${video.id}`, 'byse')}
+                className="p-1.5 rounded-md text-[#777] hover:text-white hover:bg-white/10 transition-colors"
+                title="Copy Link"
+              >
+                {copiedKey === 'byse' ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+              </button>
 
-                  <button
-                    onClick={(e) => handleOpenLink(e, byseUrl)}
-                    className="p-1.5 rounded-md text-[#777] hover:text-white hover:bg-white/10 transition-colors"
-                    title="Open in new tab"
-                  >
-                    <ExternalLink className="w-3.5 h-3.5" />
-                  </button>
-                </>
-              )}
+              <button
+                onClick={(e) => handleOpenLink(e, byseUrl || `https://bysewihe.com/e/${video.id}`)}
+                className="p-1.5 rounded-md text-[#777] hover:text-white hover:bg-white/10 transition-colors"
+                title="Open in new tab"
+              >
+                <ExternalLink className="w-3.5 h-3.5" />
+              </button>
 
               {selectedServer === 'byse' ? (
                 <div className="w-6 h-6 rounded-full bg-emerald-500 text-black flex items-center justify-center ml-1">

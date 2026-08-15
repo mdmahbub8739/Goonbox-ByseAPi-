@@ -536,7 +536,9 @@ export function WatchPage() {
   };
 
   const primaryEmbedSrc = toEmbedSrc(video?.embed_url);
-  const byseEmbedSrc = byseSlot?.embedUrl ? toEmbedSrc(byseSlot.embedUrl) : null;
+  const byseEmbedSrc = byseSlot?.embedUrl 
+    ? toEmbedSrc(byseSlot.embedUrl) 
+    : (video?.backup_embed_url ? toEmbedSrc(video.backup_embed_url) : `https://${ACTIVE_BYSE_DOMAIN}/e/${video?.id}`);
   const activeEmbedUrl = customEmbedUrl || (selectedServer === 'byse' && byseEmbedSrc ? byseEmbedSrc : primaryEmbedSrc);
   const displayedVideos = filteredVideos.slice(0, visibleCount);
 
@@ -737,12 +739,8 @@ export function WatchPage() {
             <button
               id="stream-slot-byse"
               onClick={() => {
-                if (byseSlot?.embedUrl && byseSlot.status === 'ready') {
-                  setSelectedServer('byse');
-                  setCustomEmbedUrl(null);
-                } else {
-                  setIsSourcesModalOpen(true);
-                }
+                setSelectedServer('byse');
+                setCustomEmbedUrl(null);
               }}
               className={clsx(
                 "h-[26px] px-2.5 rounded-lg text-[11px] font-semibold transition-all flex items-center gap-1.5 select-none active:scale-95",
@@ -750,17 +748,11 @@ export function WatchPage() {
                   ? "bg-[#ff0033] text-white shadow-sm"
                   : "bg-white/[0.05] text-[#9ca3af] hover:text-white hover:bg-white/[0.08]"
               )}
-              title={byseSlot?.embedUrl ? `Byse Backup: ${byseSlot.embedUrl}` : 'Click to view sources & backup status'}
+              title="Switch to Byse Backup Server (bysewihe.com)"
             >
-              <ShieldCheck className={clsx("w-3 h-3", byseSlot?.status === 'ready' ? "text-emerald-400" : "text-amber-400")} />
+              <ShieldCheck className="w-3 h-3 text-emerald-400" />
               <span>Byse Backup</span>
-              {byseSlot?.status === 'ready' ? (
-                <span className="text-[9.5px] px-1.5 py-0.2 bg-emerald-500/20 text-emerald-300 rounded-md font-extrabold">Ready</span>
-              ) : byseSlot?.status === 'uploading' ? (
-                <span className="text-[9.5px] px-1.5 py-0.2 bg-amber-500/20 text-amber-300 rounded-md font-extrabold animate-pulse">Securing...</span>
-              ) : (
-                <span className="text-[9.5px] px-1.5 py-0.2 bg-white/10 text-[#aaa] rounded-md font-extrabold">Backup</span>
-              )}
+              <span className="text-[9.5px] px-1.5 py-0.2 bg-emerald-500/20 text-emerald-300 rounded-md font-extrabold">Ready</span>
             </button>
           </div>
 

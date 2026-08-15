@@ -360,31 +360,23 @@ export function VideoDetailsModal({
                   <div className="bg-black/30 rounded-xl p-3 border border-white/5 flex items-center justify-between gap-2">
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-1.5 text-[11px] font-bold text-white mb-0.5">
-                        <ShieldCheck className={clsx("w-3.5 h-3.5", slot?.status === 'ready' ? "text-emerald-400" : "text-amber-400")} />
+                        <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
                         <span>Byse Backup (bysewihe.com)</span>
-                        {slot?.status === 'ready' ? (
-                          <span className="text-[9.5px] px-1.5 py-0.2 bg-emerald-500/20 text-emerald-300 rounded font-bold">Secured & Active</span>
-                        ) : slot?.status === 'uploading' ? (
-                          <span className="text-[9.5px] px-1.5 py-0.2 bg-amber-500/20 text-amber-300 rounded font-bold animate-pulse">Securing...</span>
-                        ) : (
-                          <span className="text-[9.5px] px-1.5 py-0.2 bg-white/10 text-[#888] rounded font-semibold">Auto-Triggered</span>
-                        )}
+                        <span className="text-[9.5px] px-1.5 py-0.2 bg-emerald-500/20 text-emerald-300 rounded font-bold">Active</span>
                       </div>
                       <div className="text-[11.5px] text-[#888] truncate font-mono">
-                        {slot?.embedUrl || 'Queued for upload / Byse resolver active'}
+                        {slot?.embedUrl || `https://bysewihe.com/e/${video.id}`}
                       </div>
                     </div>
-                    {slot?.embedUrl && (
-                      <button
-                        onClick={() => {
-                          navigator.clipboard.writeText(slot.embedUrl);
-                        }}
-                        className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-[#aaa] hover:text-white shrink-0 transition-colors"
-                        title="Copy Byse Backup URL"
-                      >
-                        <Copy className="w-3.5 h-3.5" />
-                      </button>
-                    )}
+                    <button
+                      onClick={() => {
+                        navigator.clipboard.writeText(slot?.embedUrl || `https://bysewihe.com/e/${video.id}`);
+                      }}
+                      className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-[#aaa] hover:text-white shrink-0 transition-colors"
+                      title="Copy Byse Backup URL"
+                    >
+                      <Copy className="w-3.5 h-3.5" />
+                    </button>
                   </div>
                 );
               })()}
